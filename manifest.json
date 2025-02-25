@@ -2,6 +2,7 @@
 {
   "name": "Super Pario World",
   "short_name": "Super Pario World",
+  "version": "1.0.1",
   "description": "Track your daily prayers in Mario World style",
   "start_url": "/",
   "display": "standalone",
