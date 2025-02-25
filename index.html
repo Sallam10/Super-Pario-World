@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#5ca9ff">
+    <link rel="apple-touch-icon" href="app-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <title>Super Pario World</title>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --grass: #8CD440;
+            --sky: #89D6FF;
+            --ground: #FFA666;
+            --cloud: #ffffff;
+            --mario-yellow: #FFD752;
+            --mario-red: #FF5B5B;
+            --mario-blue: #52B9FF;
+            --mario-green: #4CD964;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(180deg, var(--sky) 0%, var(--sky) 60%, var(--grass) 60%, var(--grass) 80%, var(--ground) 80%);
+            min-height: 100vh;
+            color: #333;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 10%;
+            width: 60px;
+            height: 30px;
+            background: var(--cloud);
+            border-radius: 20px;
+            box-shadow: 
+                100px 20px 0 var(--cloud),
+                200px -10px 0 var(--cloud),
+                300px 30px 0 var(--cloud),
+                400px 0px 0 var(--cloud);
+            animation: float 20s linear infinite;
+            z-index: 0;
+        }
+
+        @keyframes float {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(100vw); }
+        }
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 10px 0;
+            z-index: 1;
+            position: relative;
+        }
+        .title-icon {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+        }
+        h1 {
+            text-align: center;
+            color: #fff;
+            text-shadow: 2px 2px 0px #000;
+            font-size: 1.5em;
+            font-family: 'Press Start 2P', cursive;
+            letter-spacing: 1px;
+            margin: 0;
+        }
+        #city-select {
+            width: 100%;
+            padding: 15px;
+            font-size: 1em;
+            border: 4px solid #000;
+            background: #ffd700;
+            margin-bottom: 30px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            position: relative;
+            z-index: 1;
+            color: #000;
+            appearance: none;
+            text-align: center;
+        }
+        #city-select:hover {
+            transform: scale(1.05);
+        }
+        .prayer-card {
+            background: linear-gradient(135deg, var(--mario-yellow), #FFE066);
+            padding: 10px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: 
+                0 4px 8px rgba(0,0,0,0.1),
+                0 2px 4px rgba(255, 215, 0, 0.2);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(8px);
+        }
+        .prayer-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+        }
+        .prayer-name {
+            font-size: 1.2em;
+            color: #ff6f61;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+        .prayer-time {
+            color: #2980b9;
+            font-size: 0.9em;
+        }
+        .status {
+            width: 36px;
+            height: 36px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            border: none;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .status:hover {
+            transform: translateY(-5px);
+        }
+        .not-yet {
+            background: linear-gradient(135deg, #c17d11 0%, #795548 100%);
+            border: 2px solid #4a332d;
+            position: relative;
+        }
+        .not-yet::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background-image: url('/question-mark.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .done {
+            background: linear-gradient(135deg, #ffd700 0%, #ffa000 100%);
+        }
+        .done::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('Star.png');
+            background-size: 90% 90%;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .missed {
+            background: linear-gradient(135deg, #ff6b6b 0%, #c62828 100%);
+        }
+        .missed::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 30px;
+            height: 30px;
+            background-image: url('Dead-Mario.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        .late {
+            background: linear-gradient(135deg, #FF8C00 0%, #cc7000 100%);
+        }
+        .late::after {
+            content: '⏰';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 24px;
+        }
+        #progress {
+            margin-top: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        #progress h2 {
+            color: #2980b9;
+            margin-bottom: 15px;
+        }
+        #progress-bar {
+            width: 100%;
+            height: 30px;
+            background: #ddd;
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+        }
+        #progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #27ae60, #2ecc71); /* Green by default */
+            width: 0%;
+            transition: width 0.5s ease-in-out;
+            position: relative;
+        }
+        #progress-fill.red { /* Style for red progress bar */
+            background: linear-gradient(90deg, #c0392b, #e74c3c);
+        }
+        .prayer-icon {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            color: #fff;
+        }
+        #progress-text {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 1.2em;
+            color: #ff6f61;
+        }
+        #calendar {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+            gap: 5px;
+            margin-top: 20px;
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            width: 100%;
+            box-sizing: border-box;
+            overflow: hidden;
+        }
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-size: 0.8em;
+            position: relative;
+            gap: 2px;
+            padding: 2px;
+            min-height: 50px;
+        }
+        .calendar-day .prayer-count {
+            font-size: 0.6em;
+            line-height: 1;
+            text-align: center;
+            margin-top: 2px;
+        }
+        @media (max-width: 480px) {
+            .calendar-day {
+                font-size: 0.7em;
+                min-height: 45px;
+            }
+            .calendar-day .prayer-count {
+                font-size: 0.5em;
+            }
+        }
+        .day-0 { background: #ff0000; } /* Dark red - all missed */
+        .day-1 { background: #ff4d00; } /* Red-orange */
+        .day-2 { background: #ff9900; } /* Orange */
+        .day-3 { background: #ffcc00; } /* Yellow */
+        .day-4 { background: #99cc00; } /* Light green */
+        .day-5 { background: #00cc00; } /* Pure green - all on time */
+    </style>
+</head>
+<body>
+    <div class="title-container">
+        <img src="app-icon.png" alt="Mario Praying" class="title-icon">
+        <h1>Super Pario World <span style="font-size: 0.4em; vertical-align: super;">v1.0.0</span></h1>
+        <button id="update-btn" style="display: none; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 0.8em; cursor: pointer;">Update Available!</button>
+    </div>
+    <script>
+        let touchStart = 0;
+        let pullStarted = false;
+        
+        document.addEventListener('touchstart', e => {
+            if (window.scrollY === 0) {
+                touchStart = e.touches[0].clientY;
+                pullStarted = true;
+            }
+        });
+
+        document.addEventListener('touchmove', e => {
+            if (!pullStarted) return;
+            
+            const pullDistance = e.touches[0].clientY - touchStart;
+            if (pullDistance > 100) {
+                checkForUpdates();
+                pullStarted = false;
+            }
+        });
+
+        document.addEventListener('touchend', () => {
+            pullStarted = false;
+        });
+
+        // Check for service worker updates
+        function checkForUpdates() {
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.ready.then(registration => {
+                    registration.update();
+                });
+            }
+        }
+
+        // Check for updates every hour
+        setInterval(checkForUpdates, 3600000);
+
+        // Listen for update messages from service worker
+        navigator.serviceWorker.addEventListener('message', event => {
+            if (event.data === 'new-content-available') {
+                const updateBtn = document.getElementById('update-btn');
+                updateBtn.style.display = 'block';
+                updateBtn.onclick = () => window.location.reload();
+            }
+        });
+    </script>
+    <select id="city-select" onchange="updatePrayerTimes()">
+        <option value="cairo">Cairo, Egypt</option>
+        <option value="makkah">Makkah, Saudi Arabia</option>
+        <option value="medina">Medina, Saudi Arabia</option>
+        <option value="cairo">Cairo, Egypt</option>
+        <option value="jakarta">Jakarta, Indonesia</option>
+        <option value="karachi">Karachi, Pakistan</option>
+        <option value="london">London, UK</option>
+        <option value="newyork">New York, USA</option>
+        <option value="istanbul">Istanbul, Turkey</option>
+    </select>
+
+    <div id="prayers">
+        <div class="prayer-card" data-prayer="Fajr">
+            <div>
+                <div class="prayer-name">Fajr</div>
+                <div class="prayer-time" id="fajr-time">Pick a city!</div>
+            </div>
+            <div class="status not-yet" onclick="togglePrayer('Fajr')"></div>
+        </div>
+
+        <div class="prayer-card" data-prayer="Dhuhr">
+            <div>
+                <div class="prayer-name">Dhuhr</div>
+                <div class="prayer-time" id="dhuhr-time">Pick a city!</div>
+            </div>
+            <div class="status not-yet" onclick="togglePrayer('Dhuhr')"></div>
+        </div>
+
+        <div class="prayer-card" data-prayer="Asr">
+            <div>
+                <div class="prayer-name">Asr</div>
+                <div class="prayer-time" id="asr-time">Pick a city!</div>
+            </div>
+            <div class="status not-yet" onclick="togglePrayer('Asr')"></div>
+        </div>
+
+        <div class="prayer-card" data-prayer="Maghrib">
+            <div>
+                <div class="prayer-name">Maghrib</div>
+                <div class="prayer-time" id="maghrib-time">Pick a city!</div>
+            </div>
+            <div class="status not-yet" onclick="togglePrayer('Maghrib')"></div>
+        </div>
+
+        <div class="prayer-card" data-prayer="Isha">
+            <div>
+                <div class="prayer-name">Isha</div>
+                <div class="prayer-time" id="isha-time">Pick a city!</div>
+            </div>
+            <div class="status not-yet" onclick="togglePrayer('Isha')"></div>
+        </div>
+    </div>
+
+    <div id="progress" style="margin-top: 20px;">
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px;">
+            <h2 style="margin: 0; font-size: 1.2em;">Prayer Power</h2>
+            <div id="progress-bar" style="flex-grow: 1; height: 20px;">
+                <div id="progress-fill"></div>
+            </div>
+            <p id="progress-text" style="margin: 0; font-size: 0.9em;">0/5</p>
+        </div>
+        <div id="calendar"></div>
+    </div>
+
+    <script>
+        window.togglePrayer = function(prayer) {
+            const element = document.querySelector(`[data-prayer="${prayer}"] .status`);
+            if (prayerStatus[prayer] === 'not-yet') {
+                prayerStatus[prayer] = 'done';
+                element.className = 'status done';
+            } else if (prayerStatus[prayer] === 'done') {
+                prayerStatus[prayer] = 'late';
+                element.className = 'status late';
+            } else if (prayerStatus[prayer] === 'late') {
+                prayerStatus[prayer] = 'missed';
+                element.className = 'status missed';
+            } else {
+                prayerStatus[prayer] = 'not-yet';
+                element.className = 'status not-yet';
+            }
+            updateProgress();
+            saveHistory();
+        };
+
+        let prayerStatus = {
+            Fajr: 'not-yet',
+            Dhuhr: 'not-yet',
+            Asr: 'not-yet',
+            Maghrib: 'not-yet',
+            Isha: 'not-yet'
+        };
+
+        let prayerHistory = JSON.parse(localStorage.getItem('prayerHistory')) || {};
+
+        const cities = {
+            makkah: { lat: 21.4266, lon: 39.8256, method: 4, timezone: 'Asia/Riyadh' },
+            medina: { lat: 24.5247, lon: 39.5692, method: 4, timezone: 'Asia/Riyadh' },
+            cairo: { lat: 30.0444, lon: 31.2357, method: 5, timezone: 'Africa/Cairo' },
+            jakarta: { lat: -6.2088, lon: 106.8456, method: 2, timezone: 'Asia/Jakarta' },
+            karachi: { lat: 24.8607, lon: 67.0011, method: 1, timezone: 'Asia/Karachi' },
+            london: { lat: 51.5074, lon: -0.1278, method: 2, timezone: 'Europe/London' },
+            newyork: { lat: 40.7128, lon: -74.0060, method: 2, timezone: 'America/New_York' },
+            istanbul: { lat: 41.0082, lon: 28.9784, method: 5, timezone: 'Europe/Istanbul' }
+        };
+
+        function updateProgress() {
+            const progressFill = document.getElementById('progress-fill');
+            progressFill.innerHTML = ''; // Clear existing icons
+
+            const prayers = ['Fajr', 'Dhuhr', 'Asr', 'Maghrib', 'Isha'];
+            const totalCount = prayers.length;
+            const statuses = prayers.map(prayer => prayerStatus[prayer]);
+
+            const completedCount = statuses.filter(s => s === 'done' || s === 'late').length;
+            const percentage = (completedCount / totalCount) * 100;
+
+            progressFill.style.width = `${percentage}%`;
+            
+            // Match calendar colors
+            const colors = {
+                0: '#ff0000', // Dark red
+                1: '#ff4d00', // Red-orange
+                2: '#ff9900', // Orange
+                3: '#ffcc00', // Yellow
+                4: '#99cc00', // Light green
+                5: '#00cc00'  // Pure green
+            };
+            progressFill.style.background = colors[completedCount];
+
+            // Add icons for each prayer
+            statuses.forEach((status, index) => {
+                const icon = document.createElement('span');
+                icon.className = 'prayer-icon';
+                icon.style.left = `${(index * 20) + 10}%`;
+
+                switch(status) {
+                    case 'done':
+                        icon.style.backgroundImage = "url('Star.png')";
+                        icon.style.backgroundSize = "contain";
+                        icon.style.backgroundRepeat = "no-repeat";
+                        icon.style.backgroundPosition = "center";
+                        icon.style.width = "20px";
+                        icon.style.height = "20px";
+                        icon.textContent = '';
+                        break;
+                    case 'late':
+                        icon.textContent = '⏰';
+                        break;
+                    case 'missed':
+                        icon.style.backgroundImage = "url('Dead-Mario.png')";
+                        icon.style.backgroundSize = "contain";
+                        icon.style.backgroundRepeat = "no-repeat";
+                        icon.style.backgroundPosition = "center";
+                        icon.style.width = "20px";
+                        icon.style.height = "20px";
+                        icon.textContent = '';
+                        break;
+                    default:
+                        icon.textContent = '·';
+                }
+
+                progressFill.appendChild(icon);
+            });
+
+            document.getElementById('progress-text').textContent = 
+                `${completedCount}/5 prayers completed today`;
+        }
+
+        function saveHistory() {
+            const today = new Date().toDateString();
+            prayerHistory[today] = prayerStatus;
+            localStorage.setItem('prayerHistory', JSON.stringify(prayerHistory));
+        }
+
+        async function requestNotificationPermission() {
+    if ('Notification' in window) {
+        const permission = await Notification.requestPermission();
+        return permission === 'granted';
+    }
+    return false;
+}
+
+function scheduleNotification(prayerName, time) {
+    const [hours, minutes] = time.split(':');
+    const notificationTime = new Date();
+    notificationTime.setHours(parseInt(hours), parseInt(minutes), 0);
+
+    if (notificationTime < new Date()) return; // Time already passed
+
+    const timeUntilNotification = notificationTime.getTime() - new Date().getTime();
+
+    setTimeout(() => {
+        if (Notification.permission === 'granted') {
+            new Notification(`Time for ${prayerName}`, {
+                body: `It's time for ${prayerName} prayer (${time})`,
+                icon: 'app-icon.png'
+            });
+        }
+    }, timeUntilNotification);
+}
+
+async function updatePrayerTimes() {
+            const city = document.getElementById('city-select').value;
+            if (!city) return;
+
+            await requestNotificationPermission();
+
+            const { lat, lon, method, timezone } = cities[city];
+            try {
+                const response = await fetch(
+                    `https://api.aladhan.com/v1/timings?latitude=${lat}&longitude=${lon}&method=${method}&timezone=${timezone}`
+                );
+                const data = await response.json();
+                const timings = data.data.timings;
+
+                // Convert 24hr to AM/PM format
+                function to12Hour(time) {
+                    const [hours, minutes] = time.split(':');
+                    const hour = parseInt(hours);
+                    const ampm = hour >= 12 ? 'PM' : 'AM';
+                    const hour12 = hour % 12 || 12;
+                    return `${hour12}:${minutes} ${ampm}`;
+                }
+
+                // Update all prayer times
+                document.getElementById('fajr-time').textContent = to12Hour(timings.Fajr);
+                document.getElementById('dhuhr-time').textContent = to12Hour(timings.Dhuhr);
+                document.getElementById('asr-time').textContent = to12Hour(timings.Asr);
+                document.getElementById('maghrib-time').textContent = to12Hour(timings.Maghrib);
+                document.getElementById('isha-time').textContent = to12Hour(timings.Isha);
+
+                // Schedule notifications for each prayer
+                scheduleNotification('Fajr', timings.Fajr);
+                scheduleNotification('Dhuhr', timings.Dhuhr);
+                scheduleNotification('Asr', timings.Asr);
+                scheduleNotification('Maghrib', timings.Maghrib);
+                scheduleNotification('Isha', timings.Isha);
+
+                // Reset prayer status for new city
+                Object.keys(prayerStatus).forEach(prayer => {
+                    prayerStatus[prayer] = 'not-yet';
+                    const element = document.querySelector(`[data-prayer="${prayer}"] .status`);
+                    element.className = 'status not-yet';
+                });
+                updateProgress();
+            } catch (error) {
+                console.error('Error fetching prayer times:', error);
+                ['fajr-time', 'dhuhr-time', 'asr-time', 'maghrib-time', 'isha-time'].forEach(id => {
+                    document.getElementById(id).textContent = 'Error loading times';
+                });
+            }
+        }
+
+        function loadTodayStatus() {
+            const today = new Date().toDateString();
+            const lastAccessDate = localStorage.getItem('lastAccessDate');
+            
+            if (lastAccessDate !== today) {
+                // Reset status for new day
+                Object.keys(prayerStatus).forEach(prayer => {
+                    prayerStatus[prayer] = 'not-yet';
+                });
+                localStorage.setItem('lastAccessDate', today);
+            } else if (prayerHistory[today]) {
+                // Load today's existing status
+                prayerStatus = prayerHistory[today];
+            }
+
+            // Update UI
+            for (const [prayer, status] of Object.entries(prayerStatus)) {
+                const element = document.querySelector(`[data-prayer="${prayer}"] .status`);
+                element.className = `status ${status === 'done' ? 'done' : status === 'missed' ? 'missed' : status === 'late' ? 'late' : 'not-yet'}`;
+            }
+            updateProgress();
+        }
+
+        function renderCalendar() {
+            const calendar = document.getElementById('calendar');
+            calendar.innerHTML = '';
+
+            const today = new Date();
+            const dates = Object.keys(prayerHistory)
+                .filter(date => new Date(date) <= today)
+                .sort();
+            
+            // Always include today
+            if (!dates.includes(today.toDateString())) {
+                dates.push(today.toDateString());
+            }
+
+            const daysToShow = dates.map(date => new Date(date));
+
+            // Add month labels
+            const months = [...new Set(daysToShow.map(date => 
+                date.toLocaleString('en-US', { month: 'long' })
+            ))];
+
+            months.forEach(month => {
+                const monthLabel = document.createElement('div');
+                monthLabel.style.gridColumn = '1 / -1';
+                monthLabel.style.padding = '10px';
+                monthLabel.style.fontWeight = 'bold';
+                monthLabel.style.color = '#2980b9';
+                monthLabel.textContent = month;
+                calendar.appendChild(monthLabel);
+
+                // Add days for this month
+                daysToShow
+                    .filter(date => date.toLocaleString('en-US', { month: 'long' }) === month)
+                    .forEach(date => {
+                        const dateStr = date.toDateString();
+                        const dayData = prayerHistory[dateStr];
+                        
+                        // Only show data if we have actual prayer records
+                        const completedCount = dayData && Object.keys(dayData).length > 0 ? Object.values(dayData).filter(s => s === 'done').length : 0;
+                        const lateCount = dayData && Object.keys(dayData).length > 0 ? Object.values(dayData).filter(s => s === 'late').length : 0;
+
+                        const dayElement = document.createElement('div');
+                        dayElement.className = `calendar-day day-${completedCount}`;
+
+                        const dayOfWeek = date.toLocaleString('en-US', { weekday: 'short' });
+                        dayElement.innerHTML = `
+                            <div style="font-size: 0.8em; color: #666;">${dayOfWeek}</div>
+                            ${date.getDate()}
+                            <span class="prayer-count">${completedCount}/5${lateCount > 0 ? ` (${lateCount} late)` : ''}</span>
+                        `;
+                        calendar.appendChild(dayElement);
+                    });
+            });
+        }
+
+        window.onload = () => {
+            loadTodayStatus();
+            renderCalendar();
+            updatePrayerTimes(); // This will load Cairo's prayer times immediately
+        };
+
+        // Update the saveHistory function to also update the calendar
+        const originalSaveHistory = saveHistory;
+        saveHistory = function() {
+            originalSaveHistory();
+            renderCalendar();
+        };
+    </script>
+</body>
+</html>
