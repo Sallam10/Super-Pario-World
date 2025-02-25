@@ -300,10 +300,21 @@
 <body>
     <div class="title-container">
         <img src="app-icon.png" alt="Mario Praying" class="title-icon">
-        <h1>Super Pario World <span style="font-size: 0.4em; vertical-align: super;">v1.0.2</span></h1>
+        <h1>Super Pario World <span style="font-size: 0.4em; vertical-align: super;">v1.0.0</span></h1>
         <button id="update-btn" style="display: none; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 0.8em; cursor: pointer;">Update Available!</button>
     </div>
     <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker registered');
+                })
+                .catch(error => {
+                    console.error('Service Worker registration failed:', error);
+                });
+        }
+
         let touchStart = 0;
         let pullStarted = false;
         
