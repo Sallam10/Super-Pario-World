@@ -1,5 +1,5 @@
 
-const CACHE_NAME = 'super-pario-v1';
+const CACHE_NAME = 'super-pario-v1.0.2';
 const ASSETS = [
   '/',
   '/index.html',
