@@ -300,7 +300,7 @@
 <body>
     <div class="title-container">
         <img src="app-icon.png" alt="Mario Praying" class="title-icon">
-        <h1>Super Pario World <span style="font-size: 0.4em; vertical-align: super;">v1.0.2</span></h1>
+        <h1>Super Pario World <span style="font-size: 0.4em; vertical-align: super;">v1.0.2</span> <span style="font-size: 1.5em; margin-left: 5px; position: relative;">🌙<span style="position: absolute; top: -10px; right: -25px; font-size: 0.4em; transform: rotate(-20deg); background: #ff5b5b; padding: 2px 5px; border-radius: 3px; color: white; font-family: Arial;">رمضان</span></span></h1>
         <button id="update-btn" style="display: none; padding: 5px 10px; background: #4CAF50; color: white; border: none; border-radius: 5px; font-size: 0.8em; cursor: pointer;">Update Available!</button>
     </div>
     <script>
@@ -317,7 +317,7 @@
 
         let touchStart = 0;
         let pullStarted = false;
-        
+
         document.addEventListener('touchstart', e => {
             if (window.scrollY === 0) {
                 touchStart = e.touches[0].clientY;
@@ -327,7 +327,7 @@
 
         document.addEventListener('touchmove', e => {
             if (!pullStarted) return;
-            
+
             const pullDistance = e.touches[0].clientY - touchStart;
             if (pullDistance > 100) {
                 checkForUpdates();
@@ -340,11 +340,18 @@
         });
 
         // Check for service worker updates
-        function checkForUpdates() {
+        async function checkForUpdates() {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.ready.then(registration => {
-                    registration.update();
-                });
+                // Clear the cache
+                const cacheNames = await caches.keys();
+                await Promise.all(cacheNames.map(name => caches.delete(name)));
+                
+                // Update service worker
+                const registration = await navigator.serviceWorker.ready;
+                await registration.update();
+                
+                // Reload the page
+                window.location.reload(true);
             }
         }
 
@@ -361,15 +368,36 @@
         });
     </script>
     <select id="city-select" onchange="updatePrayerTimes()">
-        <option value="cairo">Cairo, Egypt</option>
-        <option value="makkah">Makkah, Saudi Arabia</option>
-        <option value="medina">Medina, Saudi Arabia</option>
-        <option value="cairo">Cairo, Egypt</option>
+        <option value="cairo" selected>Cairo, Egypt</option>
+        <option value="amsterdam">Amsterdam, Netherlands</option>
+        <option value="bangalore">Bangalore, India</option>
+        <option value="barcelona">Barcelona, Spain</option>
+        <option value="beijing">Beijing, China</option>
+        <option value="berlin">Berlin, Germany</option>
+        <option value="dubai">Dubai, UAE</option>
+        <option value="halifax">Halifax, Canada</option>
+        <option value="hongkong">Hong Kong</option>
+        <option value="istanbul">Istanbul, Turkey</option>
         <option value="jakarta">Jakarta, Indonesia</option>
         <option value="karachi">Karachi, Pakistan</option>
+        <option value="kualalumpur">Kuala Lumpur, Malaysia</option>
         <option value="london">London, UK</option>
+        <option value="madrid">Madrid, Spain</option>
+        <option value="makkah">Makkah, Saudi Arabia</option>
+        <option value="manila">Manila, Philippines</option>
+        <option value="medina">Medina, Saudi Arabia</option>
+        <option value="montreal">Montreal, Canada</option>
+        <option value="moscow">Moscow, Russia</option>
+        <option value="mumbai">Mumbai, India</option>
         <option value="newyork">New York, USA</option>
-        <option value="istanbul">Istanbul, Turkey</option>
+        <option value="paris">Paris, France</option>
+        <option value="rome">Rome, Italy</option>
+        <option value="seoul">Seoul, South Korea</option>
+        <option value="singapore">Singapore</option>
+        <option value="tokyo">Tokyo, Japan</option>
+        <option value="toronto">Toronto, Canada</option>
+        <option value="vancouver">Vancouver, Canada</option>
+        <option value="vienna">Vienna, Austria</option>
     </select>
 
     <div id="prayers">
@@ -456,14 +484,36 @@
         let prayerHistory = JSON.parse(localStorage.getItem('prayerHistory')) || {};
 
         const cities = {
-            makkah: { lat: 21.4266, lon: 39.8256, method: 4, timezone: 'Asia/Riyadh' },
-            medina: { lat: 24.5247, lon: 39.5692, method: 4, timezone: 'Asia/Riyadh' },
+            amsterdam: { lat: 52.3676, lon: 4.9041, method: 2, timezone: 'Europe/Amsterdam' },
+            bangalore: { lat: 12.9716, lon: 77.5946, method: 1, timezone: 'Asia/Kolkata' },
+            barcelona: { lat: 41.3851, lon: 2.1734, method: 2, timezone: 'Europe/Madrid' },
+            beijing: { lat: 39.9042, lon: 116.4074, method: 2, timezone: 'Asia/Shanghai' },
+            berlin: { lat: 52.5200, lon: 13.4050, method: 2, timezone: 'Europe/Berlin' },
             cairo: { lat: 30.0444, lon: 31.2357, method: 5, timezone: 'Africa/Cairo' },
+            dubai: { lat: 25.2048, lon: 55.2708, method: 4, timezone: 'Asia/Dubai' },
+            halifax: { lat: 44.6488, lon: -63.5752, method: 2, timezone: 'America/Halifax' },
+            hongkong: { lat: 22.3193, lon: 114.1694, method: 2, timezone: 'Asia/Hong_Kong' },
+            istanbul: { lat: 41.0082, lon: 28.9784, method: 5, timezone: 'Europe/Istanbul' },
             jakarta: { lat: -6.2088, lon: 106.8456, method: 2, timezone: 'Asia/Jakarta' },
             karachi: { lat: 24.8607, lon: 67.0011, method: 1, timezone: 'Asia/Karachi' },
+            kualalumpur: { lat: 3.1390, lon: 101.6869, method: 2, timezone: 'Asia/Kuala_Lumpur' },
             london: { lat: 51.5074, lon: -0.1278, method: 2, timezone: 'Europe/London' },
+            madrid: { lat: 40.4168, lon: -3.7038, method: 2, timezone: 'Europe/Madrid' },
+            makkah: { lat: 21.4266, lon: 39.8256, method: 4, timezone: 'Asia/Riyadh' },
+            manila: { lat: 14.5995, lon: 120.9842, method: 2, timezone: 'Asia/Manila' },
+            medina: { lat: 24.5247, lon: 39.5692, method: 4, timezone: 'Asia/Riyadh' },
+            montreal: { lat: 45.5017, lon: -73.5673, method: 2, timezone: 'America/Montreal' },
+            moscow: { lat: 55.7558, lon: 37.6173, method: 2, timezone: 'Europe/Moscow' },
+            mumbai: { lat: 19.0760, lon: 72.8777, method: 1, timezone: 'Asia/Kolkata' },
             newyork: { lat: 40.7128, lon: -74.0060, method: 2, timezone: 'America/New_York' },
-            istanbul: { lat: 41.0082, lon: 28.9784, method: 5, timezone: 'Europe/Istanbul' }
+            paris: { lat: 48.8566, lon: 2.3522, method: 2, timezone: 'Europe/Paris' },
+            rome: { lat: 41.9028, lon: 12.4964, method: 2, timezone: 'Europe/Rome' },
+            seoul: { lat: 37.5665, lon: 126.9780, method: 2, timezone: 'Asia/Seoul' },
+            singapore: { lat: 1.3521, lon: 103.8198, method: 2, timezone: 'Asia/Singapore' },
+            tokyo: { lat: 35.6762, lon: 139.6503, method: 2, timezone: 'Asia/Tokyo' },
+            toronto: { lat: 43.6532, lon: -79.3832, method: 2, timezone: 'America/Toronto' },
+            vancouver: { lat: 49.2827, lon: -123.1207, method: 2, timezone: 'America/Vancouver' },
+            vienna: { lat: 48.2082, lon: 16.3738, method: 2, timezone: 'Europe/Vienna' }
         };
 
         function updateProgress() {
@@ -478,7 +528,7 @@
             const percentage = (completedCount / totalCount) * 100;
 
             progressFill.style.width = `${percentage}%`;
-            
+
             // Match calendar colors
             const colors = {
                 0: '#ff0000', // Dark red
@@ -617,7 +667,7 @@ async function updatePrayerTimes() {
         function loadTodayStatus() {
             const today = new Date().toDateString();
             const lastAccessDate = localStorage.getItem('lastAccessDate');
-            
+
             if (lastAccessDate !== today) {
                 // Reset status for new day
                 Object.keys(prayerStatus).forEach(prayer => {
@@ -645,7 +695,7 @@ async function updatePrayerTimes() {
             const dates = Object.keys(prayerHistory)
                 .filter(date => new Date(date) <= today)
                 .sort();
-            
+
             // Always include today
             if (!dates.includes(today.toDateString())) {
                 dates.push(today.toDateString());
@@ -673,7 +723,7 @@ async function updatePrayerTimes() {
                     .forEach(date => {
                         const dateStr = date.toDateString();
                         const dayData = prayerHistory[dateStr];
-                        
+
                         // Only show data if we have actual prayer records
                         const completedCount = dayData && Object.keys(dayData).length > 0 ? Object.values(dayData).filter(s => s === 'done').length : 0;
                         const lateCount = dayData && Object.keys(dayData).length > 0 ? Object.values(dayData).filter(s => s === 'late').length : 0;
